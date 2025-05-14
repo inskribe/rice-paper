@@ -92,7 +92,7 @@ func GenrateColorPalette(img image.Image) (*RicePalette, error) {
 		if err != nil {
 			return nil, err
 		}
-		err = tightenMainPalette(&ricePalete.MainPalette)
+		err = tightenPalette(&ricePalete.MainPalette)
 		if err != nil {
 			return nil, err
 		}
@@ -325,12 +325,20 @@ func vaildateAccentPalette(palette *RicePalette) error {
 	if len(palette.AccentPalette) == 0 || len(palette.MainPalette) == 0 {
 		return fmt.Errorf("generator: Hsl slice is empty.")
 	}
+	// TODO:generator Rip out to palette parsing.
+	var colorsToRemove []int
+	for i, hsl := range palette.AccentPalette {
+		if hsl.L < config.LuminanceMin() || hsl.L > config.LuminanceMax() {
+			colorsToRemove = append(colorsToRemove, i)
+		}
+	}
+	palette.AccentPalette = removeColors(palette.AccentPalette, colorsToRemove)
 	// TODO:generator Move accent swatch count to config.
 	if len(palette.AccentPalette) < 4 {
 		fmt.Println("Extending accent palette.")
 		for _, h := range palette.MainPalette {
 			// TODO::generator Move accent thresholds to config.
-			if h.S >= 0.4 && h.L > 0.15 && h.L < 0.9 {
+			if h.S >= 0.4 && h.L > 0.20 && h.L < 0.9 {
 				palette.AccentPalette = append(palette.AccentPalette, h)
 			}
 		}
@@ -341,21 +349,21 @@ func vaildateAccentPalette(palette *RicePalette) error {
 	return nil
 }
 
-// tightenMainPalette aims to remove any colors that don't fit withing the
+// tightenPalette aims to remove any colors that don't fit withing the
 // configured specifications.
 // See also: config.Config.Generator and git_root/application_config.yml
 // Returns error if any, otherwise nil.
-func tightenMainPalette(palette *[]Hsl) error {
+func tightenPalette(palette *[]Hsl) error {
 	if palette == nil {
 		return fmt.Errorf("generator: Expected pointer to Hsl slice, received nil.")
 	}
-	println("Tightening Main Palette")
+	println("Tightening Palette")
 	var averageSaturation float64 = 0.0
 	var averageHue float64 = 0.0
 
 	for _, hsl := range *palette {
 		averageHue += hsl.H
-		averageHue += hsl.H
+		averageSaturation += hsl.S
 	}
 
 	averageHue = averageHue / float64(len(*palette))
@@ -374,7 +382,10 @@ func tightenMainPalette(palette *[]Hsl) error {
 		}
 	}
 
-	palette = removeColors(*palette, colorsToRemove)
+	*palette = removeColors(*palette, colorsToRemove)
+	if len(*palette) <= 0 {
+		return fmt.Errorf("generator: No colors within palette fit configured settings.")
+	}
 	return nil
 }
 
@@ -467,7 +478,12 @@ func createAccentPaletteGradient(accentPalette *[]Hsl) error {
 		if saturation > .40 {
 			saturation *= .50
 		}
-		end := Hsl{h.H + config.HueShiftTolerance(), saturation, luminance}
+		// Wrap hue if needed.
+		newHue := h.H + config.HueShiftTolerance()
+		if newHue > 360 {
+			newHue -= 360
+		}
+		end := Hsl{newHue, saturation, luminance}
 
 		grad, err := CreateGradient(h, end, 4)
 		if err != nil {

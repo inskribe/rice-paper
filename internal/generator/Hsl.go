@@ -151,7 +151,7 @@ func SaturationInRange(s, center, tolerance float64) bool {
 	return math.Abs(s-center) <= tolerance
 }
 
-func removeColors(s []Hsl, idxSlice []int) *[]Hsl {
+func removeColors(s []Hsl, idxSlice []int) []Hsl {
 	var result []Hsl
 
 	for i := range s {
@@ -165,7 +165,7 @@ func removeColors(s []Hsl, idxSlice []int) *[]Hsl {
 			result = append(result, s[i])
 		}
 	}
-	return &result
+	return result
 }
 
 func CreateGradient(start, end Hsl, stepNum int) ([]Hsl, error) {
