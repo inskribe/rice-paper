@@ -1,0 +1,15 @@
+version: '0.0.1'
+
+generator-settings :
+  img-compression-size : 128
+  kmeans-threshold : 0.05
+  kmeans-partition-count : 30
+  histogram-bin-count : 6
+  hue-variation-tolerance : 5
+  saturation-variation-tolerance : 0.05
+  luminance-variation-tolerance : 0.05
+  hue-shift-tolerance : 15.0
+  saturation-shift-tolerance : 0.30
+  luminance-max : 0.80
+  luminance-min : 0.20
+  palette-swatch-count : 16
