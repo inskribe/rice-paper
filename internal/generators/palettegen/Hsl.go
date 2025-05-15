@@ -1,4 +1,4 @@
-package generator
+package palettegen
 
 import (
 	"fmt"

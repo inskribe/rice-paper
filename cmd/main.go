@@ -8,7 +8,7 @@ import (
 	"os"
 	"rice-paper/internal/arganator"
 	"rice-paper/internal/config"
-	"rice-paper/internal/generator"
+	"rice-paper/internal/generators/palettegen"
 
 	"github.com/disintegration/imaging"
 )
@@ -49,15 +49,15 @@ func main() {
 	}
 	file.Close()
 
-	ricePalette, err := generator.GenrateColorPalette(img)
+	ricePalette, err := palettegen.GenrateColorPalette(img)
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
 	}
 	fmt.Println("Main Palette")
-	generator.PrintHslColors(ricePalette.MainPalette)
+	palettegen.PrintHslColors(ricePalette.MainPalette)
 	fmt.Println("Accent Palette")
-	generator.PrintHslColors(ricePalette.AccentPalette)
+	palettegen.PrintHslColors(ricePalette.AccentPalette)
 
 	if req.WriteDebugImage {
 		compressedImage := imaging.Resize(img, 100, 0, imaging.NearestNeighbor)

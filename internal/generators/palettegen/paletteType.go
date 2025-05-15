@@ -1,4 +1,4 @@
-package generator
+package palettegen
 
 //go:generate stringer -type=PaletteType
 
