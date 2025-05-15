@@ -92,7 +92,7 @@ func GenrateColorPalette(img image.Image) (*RicePalette, error) {
 		if err != nil {
 			return nil, err
 		}
-		err = tightenPalette(&ricePalete.MainPalette)
+		err = tightenPalette(&ricePalete.MainPalette, 0, 0, 0, 0)
 		if err != nil {
 			return nil, err
 		}
@@ -353,10 +353,28 @@ func vaildateAccentPalette(palette *RicePalette) error {
 // configured specifications.
 // See also: config.Config.Generator and git_root/application_config.yml
 // Returns error if any, otherwise nil.
-func tightenPalette(palette *[]Hsl) error {
+func tightenPalette(palette *[]Hsl, hueThreshold, saturationThreshold, luminanceMin, luminanceMax float64) error {
 	if palette == nil {
 		return fmt.Errorf("generator: Expected pointer to Hsl slice, received nil.")
 	}
+
+	ohFuck := false
+	if hueThreshold != 0 || saturationThreshold != 0 || luminanceMin != 0 || luminanceMax != 0 {
+		ohFuck = true
+	}
+	if hueThreshold == 0 {
+		hueThreshold = config.HueShiftTolerance()
+	}
+	if saturationThreshold == 0 {
+		saturationThreshold = config.SaturationShiftTolerance()
+	}
+	if luminanceMin == 0 {
+		luminanceMin = config.LuminanceMin()
+	}
+	if luminanceMax == 0 {
+		luminanceMax = config.LuminanceMax()
+	}
+
 	println("Tightening Palette")
 	var averageSaturation float64 = 0.0
 	var averageHue float64 = 0.0
@@ -371,21 +389,50 @@ func tightenPalette(palette *[]Hsl) error {
 	var colorsToRemove []int
 
 	for i, hsl := range *palette {
-		if !HueInRange(hsl.H, averageHue, config.HueShiftTolerance()) {
+		if !HueInRange(hsl.H, averageHue, hueThreshold) {
 			colorsToRemove = append(colorsToRemove, i)
+			continue
 		}
-		if !SaturationInRange(hsl.S, averageSaturation, config.SaturationShiftTolerance()) {
+		if !SaturationInRange(hsl.S, averageSaturation, saturationThreshold) {
 			colorsToRemove = append(colorsToRemove, i)
+			continue
 		}
-		if hsl.L < config.LuminanceMin() || hsl.L > config.LuminanceMax() {
+		if hsl.L < luminanceMin || hsl.L > luminanceMax {
 			colorsToRemove = append(colorsToRemove, i)
 		}
 	}
 
-	*palette = removeColors(*palette, colorsToRemove)
-	if len(*palette) <= 0 {
-		return fmt.Errorf("generator: No colors within palette fit configured settings.")
+	desiredColors := removeColors(*palette, colorsToRemove)
+
+	/*
+	 * If the user's configured thresholds are too strict, the palette may be empty
+	 * after filtering. Rather than failing immediately, we attempt a fallback pass
+	 * with looser constraints to salvage usable colors.
+	 *
+	 * This fallback is primarily intended to preserve color information for
+	 * gradient generation, even if it means allowing less ideal colors. The
+	 * gradient system is expected to realign the final output to the user's
+	 * preferences.
+	 */
+	if len(desiredColors) <= 0 {
+		if ohFuck {
+			return fmt.Errorf("generator: No colors within palette fit configured settings.")
+		}
+		// Fallback to looser constraints
+		const (
+			fallbackHueThreshold        = 0
+			fallbackSaturationThreshold = 0.40
+			fallbackLuminanceMin        = 0.10
+			fallbackLuminanceMax        = 0.80 // was 0, which might be invalid
+		)
+		err := tightenPalette(palette, fallbackHueThreshold, fallbackSaturationThreshold, fallbackLuminanceMin, fallbackLuminanceMax)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
+	*palette = desiredColors
+
 	return nil
 }
 

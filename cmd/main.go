@@ -61,7 +61,7 @@ func main() {
 
 	if req.WriteDebugImage {
 		compressedImage := imaging.Resize(img, 100, 0, imaging.NearestNeighbor)
-		file, err := os.Create("debug.png")
+		file, err := os.Create("./debug-output/debug.png")
 		if err != nil {
 			fmt.Printf("failed to create debug image file. %v", err)
 			file.Close()
