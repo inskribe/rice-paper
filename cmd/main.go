@@ -9,6 +9,7 @@ import (
 	"rice-paper/internal/arganator"
 	"rice-paper/internal/config"
 	"rice-paper/internal/generators/palettegen"
+	"rice-paper/internal/generators/templategen"
 
 	"github.com/disintegration/imaging"
 )
@@ -75,4 +76,6 @@ func main() {
 			}
 		}
 	}
+
+	templategen.WritePalettes(*ricePalette)
 }

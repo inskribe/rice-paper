@@ -464,9 +464,7 @@ func createMainPaletteGradient(palette *[]Hsl) error {
 	if end.L < .70 {
 		end.L = .80
 	}
-	if start.S > .40 {
-		end.S *= .50
-	}
+	end.S *= .25
 	println("Creating Main Palette gradient.")
 	gradient, err := CreateGradient(start, end, config.PaletteSwatchCount())
 	if err != nil {

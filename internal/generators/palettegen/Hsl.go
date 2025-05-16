@@ -103,9 +103,9 @@ func abs(f float64) float64 {
 	return f
 }
 
-func HslToHex(h Hsl) string {
+func (h Hsl) Hex() string {
 	r, g, b := HslToRgb(h.H, h.S, h.L)
-	return fmt.Sprintf("%02X%02X%02X", r, g, b)
+	return fmt.Sprintf("#%02X%02X%02X", r, g, b)
 }
 
 func hslToHexList(hslSamples []Hsl) []string {

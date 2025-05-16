@@ -9,6 +9,7 @@ type Request struct {
 	ImagePath       string
 	LogProgress     bool
 	WriteDebugImage bool
+	NeutralPalette  bool
 }
 
 func ParseUserArgs() (*Request, error) {
@@ -16,6 +17,7 @@ func ParseUserArgs() (*Request, error) {
 	flag.BoolVar(&req.LogProgress, "v", false, "Enable verbose mode")
 	flag.StringVar(&req.ImagePath, "i", "", "Path to input image")
 	flag.BoolVar(&req.WriteDebugImage, "o", false, "Write debug image.")
+	flag.BoolVar(&req.NeutralPalette, "n", false, "Remove neutral color alignment. If enabled, high saturaion images could produce vibrating colors.")
 
 	flag.Parse()
 
