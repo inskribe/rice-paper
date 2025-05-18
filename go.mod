@@ -1,6 +1,6 @@
-module rice-paper
+module github.com/inskribe/rice-paper.git
 
-go 1.24.2
+go 1.24.3
 
 require (
 	github.com/disintegration/imaging v1.6.2
