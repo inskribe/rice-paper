@@ -34,7 +34,6 @@ func (request PaletteRequest) CreatePalette() (*ColorPalette, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	avgHue, err := findAverageHue(hslPartitions)
 	if err != nil {
 		return nil, err
@@ -172,11 +171,11 @@ func createDarkValues(baseHue float64) hslx.HslCollection {
 func createLightValues(baseHue float64) hslx.HslCollection {
 	var result hslx.HslCollection
 
-	for i := range 3 {
+	for i := range 4 {
 		result = append(result, hslx.Hsl{
 			H: baseHue,
-			S: 0.27 + .01*float64(i),
-			L: 0.89 + 0.03*float64(i),
+			S: 0.20 - .01*float64(i),
+			L: 0.65 + 0.085*float64(i),
 		})
 	}
 	return result
