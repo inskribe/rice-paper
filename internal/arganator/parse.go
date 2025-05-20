@@ -9,6 +9,7 @@ type Request struct {
 	ImagePath       string
 	LogProgress     bool
 	WriteDebugImage bool
+	DarkMode        bool
 }
 
 func ParseUserArgs() (*Request, error) {
@@ -16,6 +17,7 @@ func ParseUserArgs() (*Request, error) {
 	flag.BoolVar(&req.LogProgress, "v", false, "Enable verbose mode")
 	flag.StringVar(&req.ImagePath, "i", "", "Path to input image")
 	flag.BoolVar(&req.WriteDebugImage, "o", false, "Write debug image.")
+	flag.BoolVar(&req.DarkMode, "d", false, "Generate a dark mode color palette.")
 
 	flag.Parse()
 

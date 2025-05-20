@@ -14,17 +14,13 @@ import (
 	"github.com/inskribe/rice-paper.git/internal/generators/templategen"
 )
 
-type Request struct {
-	ImagePath   string
-	LogProgress bool
-}
-
 func main() {
 	err := config.LoadApplicationConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	PrintRicePaper()
 	req, err := arganator.ParseUserArgs()
 
 	file, err := os.Open(req.ImagePath)
@@ -75,5 +71,18 @@ func main() {
 		}
 	}
 
-	templategen.WritePalettes(colorPalette, req.ImagePath)
+	templategen.WritePalettes(colorPalette, req)
+}
+
+func PrintRicePaper() {
+	ascii := "       __                                                                  \n" +
+		" _ __ /\\_\\    ___     __           _____      __     _____      __   _ __  \n" +
+		"/\\`'__\\/\\ \\  /'___\\ /'__`\\ _______/\\ '__`\\  /'__`\\  /\\ '__`\\  /'__`\\/\\`'__\\\n" +
+		"\\ \\ \\/ \\ \\ \\/\\ \\__//\\  __//\\______\\ \\ \\L\\ \\/\\ \\L\\.\\_\\ \\ \\L\\ \\/\\  __/\\ \\ \\/ \n" +
+		" \\ \\_\\  \\ \\_\\ \\____\\ \\____\\/______/\\ \\ ,__/\\ \\__/.\\_\\\\ \\ ,__/\\ \\____\\\\ \\_\\ \n" +
+		"  \\/_/   \\/_/\\/____/\\/____/         \\ \\ \\/  \\/__/\\/_/ \\ \\ \\/  \\/____/ \\/_/ \n" +
+		"                                     \\ \\_\\             \\ \\_\\               \n" +
+		"                                      \\/_/              \\/_/               \n"
+
+	fmt.Print(ascii)
 }
