@@ -10,6 +10,7 @@ type Request struct {
 	LogProgress     bool
 	WriteDebugImage bool
 	DarkMode        bool
+	Silent          bool
 }
 
 func ParseUserArgs() (*Request, error) {
@@ -18,15 +19,12 @@ func ParseUserArgs() (*Request, error) {
 	flag.StringVar(&req.ImagePath, "i", "", "Path to input image")
 	flag.BoolVar(&req.WriteDebugImage, "o", false, "Write debug image.")
 	flag.BoolVar(&req.DarkMode, "d", false, "Generate a dark mode color palette.")
+	flag.BoolVar(&req.Silent, "s", false, "Disable terminal output. Errors will still be displayed.")
 
 	flag.Parse()
 
-	fmt.Println("Verbose?", req.LogProgress)
-	fmt.Println("Image path:", req.ImagePath)
-
-	// Ensure we can do something with the request.
 	if req.ImagePath != "" {
-		return req, nil
+		return req, fmt.Errorf("must provide a path to an image.")
 	}
 	return nil, fmt.Errorf("invalid image path.")
 }
