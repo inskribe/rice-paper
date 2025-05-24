@@ -28,16 +28,6 @@ func main() {
 		fmt.Printf("Failed to read file at %s", req.ImagePath)
 		return
 	}
-	config, conf_fmt, err := image.DecodeConfig(file)
-	if err != nil {
-		fmt.Printf("%s", err)
-		return
-	}
-	fmt.Printf("format: %s, height: %d, width: %d\n", conf_fmt, config.Height, config.Width)
-	_, err = file.Seek(0, 0)
-	if err != nil {
-		log.Fatal("seek failed")
-	}
 
 	img, _, err := image.Decode(file)
 	if err != nil {
@@ -46,9 +36,11 @@ func main() {
 	}
 	file.Close()
 	palReq := ricepalette.PaletteRequest{
-		Image: img,
+		Image:  img,
+		Silent: req.Silent,
 	}
-	colorPalette, err := palReq.CreatePalette()
+	// colorPalette, err := palReq.CreatePalette(ricepalette.KmeansExtractor{})
+	colorPalette, err := palReq.CreatePalette(ricepalette.DeafultExtractor{GroupingFactor: 360})
 	if err != nil {
 		fmt.Printf("%v", err)
 		return
