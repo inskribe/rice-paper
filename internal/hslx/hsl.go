@@ -163,6 +163,27 @@ func (collection HslCollection) Print() {
 	}
 }
 
+func EnsureWrap(hue float64) float64 {
+	hue = math.Mod(hue, 360)
+	if hue < 0 {
+		hue += 360
+	}
+	return hue
+}
+
+func (hsl *Hsl) Print() {
+	r, g, b := hsl.Rgb()
+
+	// Print out swatch. May not be supported on all terminals.
+	fmt.Printf("\x1b[48;2;%d;%d;%dm  \x1b[0m  ", r, g, b)
+	// Print out hex and hsl values.
+	fmt.Printf(
+		"Hex: #%02X%02X%02X HSL H: %.1f S: %.2f L: %.2f \n",
+		r, g, b,
+		hsl.H, hsl.S, hsl.L,
+	)
+}
+
 // HueInRange returns true if the angular distance from h to center is within tolerance range.
 func HueInRange(h, center, tolerance float64) bool {
 	dist := HueDistance(h, center)
@@ -185,6 +206,14 @@ func HueDistance(a, b float64) float64 {
 // SaturationInRange returns true if the distance from s to center is within tolerance range.
 func SaturationInRange(s, center, tolerance float64) bool {
 	return math.Abs(s-center) <= tolerance
+}
+
+func FindDirection(start, destination float64) int {
+	distance := math.Abs(start - destination)
+	if distance < 180 {
+		return 1
+	}
+	return -1
 }
 
 func (collection *HslCollection) RemoveColors(idxSlice []int) {
