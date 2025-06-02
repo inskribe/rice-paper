@@ -1,0 +1,9 @@
+# Build directory
+bin/
+
+# Devolopment debug output
+debug-output/
+
+# Semantic Release
+node_modules/
+
